@@ -1,0 +1,75 @@
+.section3{
+    width: 100%;
+    height: 100vh;
+
+    @include flexCenter();
+
+    .container{
+        width: 80%;
+        height: 60%;
+        // background-color: rgb(77, 94, 53);
+        @include flexCenter();
+        flex-direction: column;
+        gap: 2rem;
+
+        .bookTitle{
+            // background-color: aqua;
+            width: 100%;
+            font-size: 2.5rem;
+        }
+
+        .bookDescription{
+            font-size: 1.5rem;
+            // background-color: rgb(24, 59, 90);            
+        }
+    }
+    
+    .up_container{
+        align-self: flex-end;
+        width: 100%;
+        height: 3.5rem;
+        // background-color: brown;
+        position: absolute;
+
+        @include flexCenter();
+        flex-direction: column;
+        .homeLink{
+            width: 20%;
+            height: 100%;
+            text-decoration: none;
+
+            // background-color: aqua;
+            @include flexCenter();
+            .up_innerContainer{
+                @include flexCenter();
+                gap: .3rem;
+                
+                .arrow{
+                    height: 2rem;
+                    position: relative;
+                    animation-name: arrow;
+                    animation-duration: 2.5s;
+                    animation-iteration-count: infinite;
+                    color: $mainOrange;
+                    font-weight: bold;
+                    
+                }
+                @keyframes arrow {
+                    0%   {top:0px;}
+                    25%  {top:-10px;}
+                    50%  {top:0px;}
+                    75%  {top:-10px;}
+                    100% {top:0px;}
+                }
+        
+                .goUp{
+                    font-size: .7rem;
+                    color: #000000;
+                }
+            }
+        }
+        
+    }
+    
+
+}
