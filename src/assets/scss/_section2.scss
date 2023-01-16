@@ -10,7 +10,7 @@
 
     .genreTitle{
         width: 80%;
-        font-size: 3.5rem;
+        font-size: 3.3rem;
         padding-left: 1rem;
     }
 
@@ -35,9 +35,14 @@
             gap: 1rem;
 
             background-color: $mainOrange;
+            cursor: pointer;
 
             .title{
                 text-align: center;
+                font-size: .8rem;
+            }
+            .author{
+                font-size: .7rem;
             }
         }
         .card:hover{
