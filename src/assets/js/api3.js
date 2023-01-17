@@ -1,6 +1,5 @@
 export async function getBooks(axios, wrapperResults, input, container_loader, section2) {
     try {
-        console.log('entered getbooks');
         wrapperResults.innerHTML = '';
         section2.scrollIntoView({behavior: "smooth"});
         container_loader.classList.remove('hide');
@@ -8,7 +7,7 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
         const baseUrl = 'https://openlibrary.org/subjects/';
         input = clearInput(input);
 
-        let timeoutPromise = new Promise((_, reject) => {
+        const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => {
                 reject(new Error("API call took too long to complete."));
             }, 12000);
@@ -41,8 +40,6 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
         ).join("");
 
     } catch(e) {
-        console.log(e);
-        // container_loader.classList.add('hide');
         launchError(e);
 
     } finally {
@@ -53,7 +50,7 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
 
 export async function getDescription(key, bookTitle, bookDescription, axios, container_loader) {
     try {
-        console.log('entered getDescription');
+        console.log(key);
         bookTitle.textContent = '';
         bookDescription.textContent = '';
         container_loader.classList.remove('hide');
@@ -70,18 +67,14 @@ export async function getDescription(key, bookTitle, bookDescription, axios, con
 
         const title = result?.data?.title ?? 'Titolo non trovato';
         let description = result?.data?.description ?? 'Descrizione non trovata';
-        console.log(description);
         
         if (typeof description === 'object' && description.hasOwnProperty('value')) {
             description = description.value;
-            console.log(description);
         }
 
         bookTitle.textContent = title;  
         bookDescription.textContent = description;
     } catch(e) {
-        console.log(e);
-        // container_loader.classList.add('hide');
         launchError(e);
     } finally {
         container_loader.classList.add('hide');
@@ -90,20 +83,15 @@ export async function getDescription(key, bookTitle, bookDescription, axios, con
 
 
 // 
-// 
-// end api functions
-// 
-// 
-
 
 function clearInput(input) {
-    let cInput = input.split(" ");
-    return cInput[0];
+
+    input = input.trim();
+    input = input.replace(/\s+/g, '_');
+    return input;
 }
 
 function launchError(e) {
-    // console.log(e);
-    
     if (e.message === "API call took too long to complete.") {
         console.log("Error: API call took too long to complete.");
     } else if (e.message === "No results found."){

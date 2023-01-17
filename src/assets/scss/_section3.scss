@@ -11,6 +11,7 @@
         @include flexCenter();
         flex-direction: column;
         gap: 2rem;
+        overflow-y: scroll;
 
         .bookTitle{
             // background-color: aqua;
@@ -20,9 +21,20 @@
 
         .bookDescription{
             font-size: 1.5rem;
+            max-height: 80%;
             // background-color: rgb(24, 59, 90);            
         }
     }
+
+.bookDescription::-webkit-scrollbar {
+    display: none;
+}
+
+.bookDescription {
+    overflow-y: scroll; /* Add the ability to scroll */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
     
     .up_container{
         align-self: flex-end;
