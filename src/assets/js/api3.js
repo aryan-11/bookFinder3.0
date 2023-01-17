@@ -41,7 +41,7 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
 
     } catch(e) {
         launchError(e);
-
+        wrapperResults.innerHTML = "Sorry, there was an error retrieving the information. Please check your internet connection and try again later.";
     } finally {
         container_loader.classList.add('hide');
     }
@@ -59,6 +59,8 @@ export async function getDescription(key, bookTitle, bookDescription, axios, con
             setTimeout(() => {
                 reject(new Error("API call took too long to complete."));
             }, 12000);
+        }).catch(e => {
+            bookDescription.innerHTML = "Sorry, the request took too long to complete. Please check your internet connection and try again later.";
         });
 
         let response = await axios.get(`https://openlibrary.org${key}.json`);
@@ -76,6 +78,7 @@ export async function getDescription(key, bookTitle, bookDescription, axios, con
         bookDescription.textContent = description;
     } catch(e) {
         launchError(e);
+        bookDescription.innerHTML = "Sorry, there was an error retrieving the information. Please check your internet connection and try again later.";
     } finally {
         container_loader.classList.add('hide');
     }
