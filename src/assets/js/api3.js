@@ -1,6 +1,6 @@
 export async function getBooks(axios, wrapperResults, input, container_loader, section2) {
     try {
-        console.debug('entered getbooks');
+        console.log('entered getbooks');
         wrapperResults.innerHTML = '';
         section2.scrollIntoView({behavior: "smooth"});
         container_loader.classList.remove('hide');
@@ -16,8 +16,6 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
         let resultPromise = axios.get(`${baseUrl}${input.toLowerCase()}.json`);
         
         let result = await Promise.race([timeoutPromise, resultPromise]);
-        container_loader.classList.add('hide');
-
 
         const works = result?.data?.works ?? 'not found';
 
@@ -43,10 +41,12 @@ export async function getBooks(axios, wrapperResults, input, container_loader, s
         ).join("");
 
     } catch(e) {
-        console.debug(e);
-        container_loader.classList.add('hide');
+        console.log(e);
+        // container_loader.classList.add('hide');
         launchError(e);
 
+    } finally {
+        container_loader.classList.add('hide');
     }
 }
 
@@ -73,21 +73,27 @@ export async function getDescription(key, bookTitle, bookDescription, axios, con
         console.log(description);
         
         if (typeof description === 'object' && description.hasOwnProperty('value')) {
-            // description = description.value;
             description = description.value;
             console.log(description);
         }
 
-        container_loader.classList.add('hide');
-
         bookTitle.textContent = title;  
         bookDescription.textContent = description;
     } catch(e) {
-        console.debug(e);
-        container_loader.classList.add('hide');
+        console.log(e);
+        // container_loader.classList.add('hide');
         launchError(e);
+    } finally {
+        container_loader.classList.add('hide');
     }
 }
+
+
+// 
+// 
+// end api functions
+// 
+// 
 
 
 function clearInput(input) {
@@ -96,33 +102,33 @@ function clearInput(input) {
 }
 
 function launchError(e) {
-    // console.debug(e);
+    // console.log(e);
     
     if (e.message === "API call took too long to complete.") {
-        console.debug("Error: API call took too long to complete.");
+        console.log("Error: API call took too long to complete.");
     } else if (e.message === "No results found."){
-        console.debug("Error: No results found.");
+        console.log("Error: No results found.");
     } else {
 
         switch (e.constructor) {
             case TypeError:
-                console.debug("TypeError:", e.message);
+                console.log("TypeError:", e.message);
                 break;
             case ReferenceError:
-                console.debug("ReferenceError:", e.message);
+                console.log("ReferenceError:", e.message);
                 break;
             case SyntaxError:
-                console.debug("SyntaxError:", e.message);
+                console.log("SyntaxError:", e.message);
                 break;
             case Error:
                 if (e.message === "works is not an array.") {
-                    console.debug("Error: works is not an array.");
+                    console.log("Error: works is not an array.");
                 } else {
-                    console.debug("Error:", e.message);
+                    console.log("Error:", e.message);
                 }
                 break;
             default:
-                console.debug(e);
+                console.log(e);
                 break;
         }
     }
