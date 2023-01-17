@@ -1,71 +1,126 @@
 export async function getBooks(axios, wrapperResults, input, container_loader, section2) {
-    try
-    {
-        console.log('entrato nel getbooks');
+    try {
         wrapperResults.innerHTML = '';
         section2.scrollIntoView({behavior: "smooth"});
-        setTimeout(() => {
-            container_loader.classList.remove('hide');
-        }, 500);
+        container_loader.classList.remove('hide');
 
+        const baseUrl = 'https://openlibrary.org/subjects/';
         input = clearInput(input);
-         
-        let result = await axios.get(`https://openlibrary.org/subjects/${input.toLowerCase()}.json`)
-        .catch(function (error) {
-            console.log(error);
-            wrapperResults.innerHTML = "<p>There might be an Error...<br>Check your internet connection and try again</p>";
-        });
 
-        container_loader.classList.add('hide');
-        
-        const works = result?.data?.works ?? 'non trovato';
-        works.forEach(element => {
-            wrapperResults.innerHTML += 
-            `
-                <div class="card" id="${element.key}">
-                    <p class="title">${element.title}</p>
-                    <p class="author">${element.authors[0].name}</p>
-                </div>
-                `;
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+                reject(new Error("API call took too long to complete."));
+            }, 12000);
         });
-    }
-    catch{
-        (e) => {
-            alert(e);
+        let resultPromise = axios.get(`${baseUrl}${input.toLowerCase()}.json`);
+        
+        let result = await Promise.race([timeoutPromise, resultPromise]);
+
+        const works = result?.data?.works ?? 'not found';
+
+        if(!Array.isArray(works)) throw new Error("works is not an array.");
+        
+        if(works.length === 0) {
+            throw new Error("No results found.")
         }
 
+        const worksData = works.map((element) => {
+            return {
+                key: element.key,
+                title: element.title,
+                author: element.authors[0].name
+            }
+        });
+
+        wrapperResults.innerHTML += worksData.map(({key, title, author}) => 
+            `<div class="card" id="${key}">
+                <p class="title">${title}</p>
+                <p class="author">${author}</p>
+            </div>`
+        ).join("");
+
+    } catch(e) {
+        launchError(e);
+        wrapperResults.innerHTML = "Sorry, there was an error retrieving the information. Please check your internet connection and try again later.";
+    } finally {
+        container_loader.classList.add('hide');
     }
-    
 }
+
 
 export async function getDescription(key, bookTitle, bookDescription, axios, container_loader) {
     try {
+        console.log(key);
         bookTitle.textContent = '';
         bookDescription.textContent = '';
         container_loader.classList.remove('hide');
-        let response = await axios.get(`https://openlibrary.org${key}.json`)
-        .catch(function (error) {
-            console.log(error);
-            wrapperResults.innerHTML = "<p>There might be an Error...<br>Check your internet connection and try again</p>";
-          });;
-        const title = response?.data?.title ?? 'non trovato';
-        const description = response?.data?.description ?? 'non trovato';
-        container_loader.classList.add('hide');
 
-        bookTitle.textContent = title;
-        bookDescription.textContent = description;
-    }
-    catch {
-        (e) => {
-            alert(e);
+        let timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+                reject(new Error("API call took too long to complete."));
+            }, 12000);
+        }).catch(e => {
+            bookDescription.innerHTML = "Sorry, the request took too long to complete. Please check your internet connection and try again later.";
+        });
+
+        let response = await axios.get(`https://openlibrary.org${key}.json`);
+
+        let result = await Promise.race([timeoutPromise, response]);
+
+        const title = result?.data?.title ?? 'Titolo non trovato';
+        let description = result?.data?.description ?? 'Descrizione non trovata';
+        
+        if (typeof description === 'object' && description.hasOwnProperty('value')) {
+            description = description.value;
         }
+
+        bookTitle.textContent = title;  
+        bookDescription.textContent = description;
+    } catch(e) {
+        launchError(e);
+        bookDescription.innerHTML = "Sorry, there was an error retrieving the information. Please check your internet connection and try again later.";
+    } finally {
+        container_loader.classList.add('hide');
     }
 }
 
+
+// 
+
 function clearInput(input) {
-    let cInput = input.split(" ");
 
-    console.log(cInput[0]);
+    input = input.trim();
+    input = input.replace(/\s+/g, '_');
+    return input;
+}
 
-    return cInput[0];
+function launchError(e) {
+    if (e.message === "API call took too long to complete.") {
+        console.log("Error: API call took too long to complete.");
+    } else if (e.message === "No results found."){
+        console.log("Error: No results found.");
+    } else {
+
+        switch (e.constructor) {
+            case TypeError:
+                console.log("TypeError:", e.message);
+                break;
+            case ReferenceError:
+                console.log("ReferenceError:", e.message);
+                break;
+            case SyntaxError:
+                console.log("SyntaxError:", e.message);
+                break;
+            case Error:
+                if (e.message === "works is not an array.") {
+                    console.log("Error: works is not an array.");
+                } else {
+                    console.log("Error:", e.message);
+                }
+                break;
+            default:
+                console.log(e);
+                break;
+        }
+    }
 }

@@ -3,8 +3,8 @@ import '../scss/index.scss';
 import axios from "axios";
 
 
-import { getBooks } from './api3';
-import { getDescription } from "./api3";
+import { getBooks } from './api';
+import { getDescription } from "./api";
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
